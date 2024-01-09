@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <sys/mman.h>
+#include <linux/mman.h>
+
+#define SIZE_1G (1*1024*1024*1024)
+#define HUGE_SIZE SIZE_1G
+// #define HUGE_SIZE 4096
+#define MMAP_HUGE_FLAGS MAP_HUGETLB | MAP_HUGE_1GB
+
+int main() {
+    //void *ptr = mmap(NULL, HUGE_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_POPULATE | MAP_HUGE_1GB, -1, 0);
+    void *ptr = mmap(NULL, HUGE_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_POPULATE | MAP_HUGE_1GB | MAP_HUGETLB, -1, 0);
+
+    if(ptr == MAP_FAILED) printf("Failed\n");
+    else printf("Success\n");
+}

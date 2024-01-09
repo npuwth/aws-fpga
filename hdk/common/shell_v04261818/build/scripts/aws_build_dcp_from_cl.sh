@@ -217,7 +217,8 @@ then
 fi
 
 # Use timestamp for logs and output files
-timestamp=$(date +"%y_%m_%d-%H%M%S") 
+# timestamp=$(date +"%y_%m_%d-%H%M%S")
+timestamp="23_12_13-043104"
 logname=$timestamp.vivado.log
 ln -s -f $logname last_log
 

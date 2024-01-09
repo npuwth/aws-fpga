@@ -35,6 +35,7 @@ int fpga_hugealloc_get_all_pages(struct fpga_hugepage_desc **descs) {
     ptr = mmap(NULL, npages * SIZE_1G, PROT_READ|PROT_WRITE,
             MAP_PRIVATE|MAP_ANONYMOUS|MAP_HUGETLB|MAP_HUGE_1GB|MAP_POPULATE, -1, 0);
 
+    printf("Mapping huge pages.\n");
     fail_on(ptr == MAP_FAILED, err_free, "Error mapping huge pages");
 
     *descs = malloc(npages * sizeof(struct fpga_hugepage_desc));
@@ -73,9 +74,11 @@ err_free:
 }
 
 int fpga_hugealloc_get(void **va, uint64_t *pa, uint64_t *sizeB) {
+    // printf("Mapping huge page.\n");
     void *ptr = mmap(NULL, HUGE_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_POPULATE | MMAP_HUGE_FLAGS, -1, 0);
-    fail_on(ptr == MAP_FAILED, err, "Error mapping one huge page");
-
+    printf("Mapping huge page.\n");
+    fail_on(ptr == MAP_FAILED, err, "Error mapping one huge page"); //here
+    // printf("here.\n");
     uint64_t vfn;
     int ret;
     struct pagemap_entry pe;

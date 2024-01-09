@@ -27,8 +27,10 @@ LIB_ALL_FILES = $(LIB_SRC) $(LIB_HEADER)
 LIB_OBJ = $(LIB_SRC:.c=.o)
 
 
-APP_AGFI_ID=agfi-0fa94e30b488273e0
-APP_AGFI_ID_LOSSCHECK=agfi-04d184e6f1ac13f7a
+#APP_AGFI_ID=agfi-0fa94e30b488273e0
+#APP_AGFI_ID_LOSSCHECK=agfi-04d184e6f1ac13f7a
+APP_AGFI_ID=agfi-05bc1de775d5cdec2
+APP_AGFI_ID_LOSSCHECK=agfi-05bc1de775d5cdec2
 include ${CL_FPGARR_ROOT}/software/include/Makefile.include.common
 
 CFLAGS += -I.

@@ -322,7 +322,7 @@ int main(int argc, char **argv)
     fail_on(rc, out, "init hls failed");
     rc = init_rr(0);
     fail_on(rc, out, "init rr failed");
-    do_pre_rr();
+    do_pre_rr(); //here
     fail_on(is_replay(), out, "Skip application code, replaying");
 
     // Call the main function of HLS application

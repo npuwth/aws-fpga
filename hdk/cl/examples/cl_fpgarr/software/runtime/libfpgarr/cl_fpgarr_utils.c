@@ -24,7 +24,9 @@ uint8_t *rr_alloc_buffer(uint64_t size, uint64_t *pa) {
 #else
     void *va;
     uint64_t sizeB;
-    assert(fpga_hugealloc_get(&va, pa, &sizeB) == 0);
+    printf("Start fpga_hugealloc_get.\n");
+    int rc = fpga_hugealloc_get(&va, pa, &sizeB);
+    assert(rc == 0);
     assert(size <= sizeB);
     memset(va, 0, sizeB);
     log_info("rr_alloc_buffer, va %p, pa %p, size %ld", va, (void *)(*pa),
@@ -99,7 +101,7 @@ void dump_trace(const char *msg, const char *filename, uint8_t *p,
 
 uint8_t *irq_buffer = NULL;
 uint64_t irq_buffer_size = 0;
-void init_irq() {
+void init_irq() { //here
     irq_buffer_size = 4096;
     irq_buffer =
         rr_alloc_setup_buffer(irq_buffer_size, INT_BUF_UPDATE);

@@ -210,7 +210,7 @@ void do_replay_stop() {
         rr_dealloc_buffer(validate_buffer);
     }
 }
-void do_pre_rr() {
+void do_pre_rr() { //here
     // always allocate irq buffer first to make sure its phy addr is always the
     // same (at least I hope this works)
     init_irq();

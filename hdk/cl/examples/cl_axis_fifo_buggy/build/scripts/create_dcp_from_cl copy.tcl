@@ -223,6 +223,128 @@ source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
 ##################################################################
 set_param hd.clockRoutingWireReduction false
 
+##################################################
+### CL XPR OOC Synthesis
+##################################################
+if {${cl.synth}} {
+   source -notrace ${SYNTH_SCRIPTS}
+   set synth_dcp ${timestamp}.CL.post_synth.dcp
+} else {
+   open_checkpoint ../checkpoints/CL.post_synth.dcp
+   set synth_dcp CL.post_synth.dcp
+}
+
+##################################################
+### Implementation
+##################################################
+if {$implement} {
+
+   ########################
+   # Link Design
+   ########################
+   if {$link} {
+      ####Create in-memory prjoect and setup IP cache location
+      create_project -part [DEVICE_TYPE] -in_memory
+      set_property IP_REPO_PATHS $cacheDir [current_project]
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Combining Shell and CL design checkpoints";
+      add_files $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+      #add_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
+      add_files $CL_DIR/build/checkpoints/$synth_dcp
+      set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $CL_DIR/build/checkpoints/$synth_dcp]
+
+      #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
+      read_xdc [ list \
+         $CL_DIR/build/constraints/cl_pnr_user.xdc
+      ]
+      set_property PROCESSING_ORDER late [get_files cl_pnr_user.xdc]
+
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running link_design";
+      link_design -top $TOP -part [DEVICE_TYPE] -reconfig_partitions {WRAPPER_INST/SH WRAPPER_INST/CL}
+
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - PLATFORM.IMPL==[get_property PLATFORM.IMPL [current_design]]";
+      ##################################################
+      # Apply Clock Properties for Clock Table Recipes
+      ##################################################
+      puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Sourcing aws_clock_properties.tcl to apply properties to clocks. ";
+
+      # Apply properties to clocks
+      source $HDK_SHELL_DIR/build/scripts/aws_clock_properties.tcl
+
+      # Write post-link checkpoint
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Writing post-link_design checkpoint ${timestamp}.post_link.dcp";
+      write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.post_link.dcp
+   }
+
+   ########################
+   # CL Optimize
+   ########################
+   if {$opt} {
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running optimization";
+      impl_step opt_design $TOP $opt_options $opt_directive $opt_preHookTcl $opt_postHookTcl
+      if {$psip} {
+         impl_step opt_design $TOP "-merge_equivalent_drivers -sweep"
+      }
+   }
+
+   ########################
+   # CL Place
+   ########################
+   if {$place} {
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running placement";
+      if {$psip} {
+         append place_options " -fanout_opt"
+      }
+      impl_step place_design $TOP $place_options $place_directive $place_preHookTcl $place_postHookTcl
+   }
+
+   ##############################
+   # CL Post-Place Optimization
+   ##############################
+   if {$phys_opt} {
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running post-place optimization";
+      impl_step phys_opt_design $TOP $phys_options $phys_directive $phys_preHookTcl $phys_postHookTcl
+   }
+
+   ########################
+   # CL Route
+   ########################
+   if {$route} {
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Routing design";
+      impl_step route_design $TOP $route_options $route_directive $route_preHookTcl $route_postHookTcl
+   }
+
+   ##############################
+   # CL Post-Route Optimization
+   ##############################
+   set SLACK [get_property SLACK [get_timing_paths]]
+   #Post-route phys_opt will not be run if slack is positive or greater than -200ps.
+   if {$route_phys_opt && $SLACK > -0.400 && $SLACK < 0} {
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running post-route optimization";
+      impl_step route_phys_opt_design $TOP $post_phys_options $post_phys_directive $post_phys_preHookTcl $post_phys_postHookTcl
+   }
+
+   ##############################
+   # Final Implmentation Steps
+   ##############################
+   # Report final timing
+   report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
+
+   # This is what will deliver to AWS
+   puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Writing final DCP to to_aws directory.";
+
+   #FIXME -- THIS SHOULD BE REMOVED FROM THE FINAL SCRIPT
+   #write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed_before_ddr_fix.dcp
+   #source top_ddr_fix.tcl
+   #checkpoint can used by developer for analysis and hence donot encrypt
+   write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_routed.dcp
+   #checkpoint that will be sent to aws and hence encrypt
+   write_checkpoint -encrypt -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+
+   # Generate debug probes file
+   write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
+
+   close_project
+}
 
 # ################################################
 # Create Manifest and Tarball for delivery

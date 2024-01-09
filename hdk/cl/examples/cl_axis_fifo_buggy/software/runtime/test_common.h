@@ -28,14 +28,14 @@
 #include <poll.h>
 
 #include <utils/sh_dpi_tasks.h>
-#include "cl_fpgarr.h"
+#include "/home/ubuntu/aws-fpga/hdk/cl/examples/cl_fpgarr/software/runtime/libfpgarr/cl_fpgarr.h"
 
 #ifdef SV_TEST
 # include <fpga_pci_sv.h>
 #else
 # include <fpga_pci.h>
 # include <fpga_mgmt.h>
-# include "fpga_dma.h"
+# include "/home/ubuntu/aws-fpga/sdk/userspace/include/fpga_dma.h"
 # include <utils/lcd.h>
 #endif
 /*

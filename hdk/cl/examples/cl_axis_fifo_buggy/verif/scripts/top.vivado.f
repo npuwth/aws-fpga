@@ -83,19 +83,19 @@ ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/sh_ddr.sv
 
 
 --define DISABLE_VJTAG_DEBUG
-${CL_ROOT}/design/axil_slave.sv
-${CL_ROOT}/design/mem_scrb.sv
-${CL_ROOT}/design/cl_tst_scrb.sv
-${CL_ROOT}/design/cl_tst.sv
-${CL_ROOT}/design/cl_int_tst.sv
-${CL_ROOT}/design/cl_dram_dma_pkg.sv
-${CL_ROOT}/design/cl_dma_pcis_slv.sv
-${CL_ROOT}/design/cl_pcim_mstr.sv
-${CL_ROOT}/design/cl_ila.sv
-${CL_ROOT}/design/cl_vio.sv
-${CL_ROOT}/design/cl_int_slv.sv
-${CL_ROOT}/design/cl_ocl_slv.sv
-${CL_ROOT}/design/cl_sda_slv.sv
-${CL_ROOT}/design/cl_dram_dma_axi_mstr.sv
-${CL_ROOT}/design/cl_dram_dma.sv
+${CL_ROOT}/../cl_dram_dma/design/axil_slave.sv
+${CL_ROOT}/../cl_dram_dma/design/mem_scrb.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_tst_scrb.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_tst.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_int_tst.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_dram_dma_pkg.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_dma_pcis_slv.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_pcim_mstr.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_ila.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_vio.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_int_slv.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_ocl_slv.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_sda_slv.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_dram_dma_axi_mstr.sv
+${CL_ROOT}/../cl_dram_dma/design/cl_dram_dma.sv
 
